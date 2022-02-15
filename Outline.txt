@@ -1,0 +1,60 @@
+Database Schema (replace with something pretty made with Lucidchart once finalized)
+
+Table: Customer
+*CustomerID (PK)
+*FirstName
+MiddleName
+*LastName
+*AddressLine1
+AddressLine2
+*Zipcode
+*City
+*State
+*Country
+Comments
+
+Table: Product
+*ProductID (PK)
+*Name
+*Price
+*Restrictions
+*Unit
+Comments
+
+Table: Sales
+*SaleID (PK)
+*CustomerID (FK)
+*ProductID (FK)
+*Quantity
+*FinalPrice
+*ShippingCost
+Comments
+
+Table: Inventory
+*InventoryID (PK)
+*ProductID (FK)
+*Quantity
+*AcquisitionDate
+*ExpirationDate
+Comments
+
+GUI Schema
+Tab: View Products
+Display table of products
+Edit current product values
+Add new products
+
+Tab: View Customers
+Display table of customers
+Edit current customer values
+Add new customers
+
+Tab Sales
+Display sales
+Edit sales values
+Add new sale records
+
+Tab Inventory
+Display inventory
+Edit inventory values
+Add new inventories
