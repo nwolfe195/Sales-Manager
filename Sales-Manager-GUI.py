@@ -20,28 +20,45 @@ class App(tk.Tk):
         tabControl = ttk.Notebook(self)
 
         self.tabProduct = ttk.Frame(tabControl)
-        self.tab_setup('Product')
+        self.tab_setup('Product', self.tabProduct)
         tabControl.add(self.tabProduct, text='Products')
 
-        tabCustomers = ttk.Frame(tabControl)
-        tabControl.add(tabCustomers, text='Customers')
-        tabSales = ttk.Frame(tabControl)
-        tabControl.add(tabSales, text='Sales')
-        tabInventory = ttk.Frame(tabControl)
-        tabControl.add(tabInventory, text='Inventory')
+        self.tabCustomers = ttk.Frame(tabControl)
+        self.tab_setup('Customer', self.tabCustomers)
+        tabControl.add(self.tabCustomers, text='Customers')
+
+        self.tabSales = ttk.Frame(tabControl)
+        self.tab_setup('Sales', self.tabSales)
+        tabControl.add(self. tabSales, text='Sales')
+
+        self.tabInventory = ttk.Frame(tabControl)
+        self.tab_setup('Inventory', self.tabInventory)
+        tabControl.add(self.tabInventory, text='Inventory')
+
         tabControl.pack(expand=1, fill='both')
 
-
-        #self.add_products('Product 1',10.00,'Unrestricted','oz','This is the first product')
-
-    def tab_setup(self, table):
+    def tab_setup(self, table, tab):
+        ttk.Button(tab, text='Add '+table, command=self.add_entry).grid(column=0, row=0)
         sql_query = 'SELECT * FROM %s' % table
         query = self.conn.execute(sql_query)
         cols = [column[0] for column in query.description]
         for i in range(len(cols)-1):
-            ttk.Label(self.tabProduct, text=cols[i+1]).grid(column=i, row=0)
+            ttk.Label(tab, text=cols[i+1]).grid(column=i, row=1)
         data = pd.DataFrame.from_records(data=query.fetchall(), columns=cols)
-        print(data)
+        for i in range(len(data)):
+            for j in range(len(cols)-1):
+                ttk.Label(tab, text=data.loc[i, cols[j+1]]).grid(column=j, row=i+2)
+            ttk.Button(tab, text='Edit', command=self.edit_entry).grid(column=len(cols), row=i+2)
+            ttk.Button(tab, text='Delete', command=self.delete_entry).grid(column=len(cols)+1, row=i+2)
+
+    def edit_entry(self):
+        print('This will be an edit')
+
+    def delete_entry(self):
+        print('This will be a delete')
+
+    def add_entry(self):
+        print('This will be an add')
 
     def add_products(self, name, price, restrictions, unit, comment):
         sql_insert = 'INSERT INTO Product (Name, Price, Restrictions, Unit, Comment) VALUES (\'%s\', %d, \'%s\', \'%s\', \'%s\')' % (name, price, restrictions, unit, comment)
