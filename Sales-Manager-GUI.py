@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import *
 from tkinter import ttk
 import sqlite3
 import pandas as pd
@@ -16,7 +17,9 @@ class App(tk.Tk):
         self.inventory_name_list = [tuple[0] for tuple in self.conn.execute('SELECT * FROM Inventory').description]
 
         # App configuration
+        self.colwidth = 20
         self.title('Sales Manager')
+        self.geometry('800x400')
         tabControl = ttk.Notebook(self)
 
         self.tabProduct = ttk.Frame(tabControl)
@@ -38,16 +41,16 @@ class App(tk.Tk):
         tabControl.pack(expand=1, fill='both')
 
     def tab_setup(self, table, tab):
-        ttk.Button(tab, text='Add '+table, command=self.add_entry).grid(column=0, row=0)
         sql_query = 'SELECT * FROM %s' % table
         query = self.conn.execute(sql_query)
         cols = [column[0] for column in query.description]
+        ttk.Button(tab, text='Add ' + table, command=lambda: self.add_entry(table, cols)).grid(column=0, row=0)
         for i in range(len(cols)-1):
-            ttk.Label(tab, text=cols[i+1]).grid(column=i, row=1)
+            ttk.Label(tab, text=cols[i+1], width=self.colwidth).grid(column=i, row=1)
         data = pd.DataFrame.from_records(data=query.fetchall(), columns=cols)
         for i in range(len(data)):
             for j in range(len(cols)-1):
-                ttk.Label(tab, text=data.loc[i, cols[j+1]]).grid(column=j, row=i+2)
+                ttk.Label(tab, text=data.loc[i, cols[j+1]], width=self.colwidth).grid(column=j, row=i+2)
             ttk.Button(tab, text='Edit', command=self.edit_entry).grid(column=len(cols), row=i+2)
             ttk.Button(tab, text='Delete', command=self.delete_entry).grid(column=len(cols)+1, row=i+2)
 
@@ -57,8 +60,16 @@ class App(tk.Tk):
     def delete_entry(self):
         print('This will be a delete')
 
-    def add_entry(self):
-        print('This will be an add')
+    def add_entry(self, table, cols):
+        add_popup = Toplevel()
+        add_popup.title('Add to '+table)
+        for i in range(len(cols)-1):
+            ttk.Label(add_popup, text=cols[i+1]).grid(column=i, row=0)
+            cols[i+1] = tk.Text(add_popup, height=1, width=self.colwidth).grid(column=i, row=1)
+        ttk.Button(add_popup, text='Add', command=lambda: self.add_entry_sql('eventually data from fields')).grid(column=len(cols), row=2)
+
+    def add_entry_sql(self, data):
+        print(data)
 
     def add_products(self, name, price, restrictions, unit, comment):
         sql_insert = 'INSERT INTO Product (Name, Price, Restrictions, Unit, Comment) VALUES (\'%s\', %d, \'%s\', \'%s\', \'%s\')' % (name, price, restrictions, unit, comment)
