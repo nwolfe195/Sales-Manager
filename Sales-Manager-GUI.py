@@ -19,7 +19,6 @@ class App(tk.Tk):
         # App configuration
         self.colwidth = 20
         self.title('Sales Manager')
-        self.geometry('800x400')
         tabControl = ttk.Notebook(self)
 
         self.tabProduct = ttk.Frame(tabControl)
@@ -80,6 +79,7 @@ class App(tk.Tk):
         sql_insert = 'INSERT INTO %s (%s) VALUES (\'%s\')' % (table, col_string, values_string)
         self.conn.execute(sql_insert)
         self.conn.commit()
+        self.tab_setup(table, self.tabProduct)
 
     def get_values(self, text_widget):
         value = text_widget.get("1.0", END)
