@@ -63,18 +63,27 @@ class App(tk.Tk):
     def add_entry(self, table, cols):
         add_popup = Toplevel()
         add_popup.title('Add to '+table)
+        values = []
         for i in range(len(cols)-1):
             ttk.Label(add_popup, text=cols[i+1]).grid(column=i, row=0)
-            cols[i+1] = tk.Text(add_popup, height=1, width=self.colwidth).grid(column=i, row=1)
-        ttk.Button(add_popup, text='Add', command=lambda: self.add_entry_sql('eventually data from fields')).grid(column=len(cols), row=2)
+            text_value = tk.Text(add_popup, height=1, width=self.colwidth)
+            values.append(text_value)
+            text_value.grid(column=i, row=1)
+        ttk.Button(add_popup, text='Add', command=lambda: self.add_entry_sql(table, cols, values)).grid(column=len(cols), row=2)
+        ttk.Button(add_popup, text='Close', command=add_popup.destroy).grid(column=len(cols), row=3)
 
-    def add_entry_sql(self, data):
-        print(data)
-
-    def add_products(self, name, price, restrictions, unit, comment):
-        sql_insert = 'INSERT INTO Product (Name, Price, Restrictions, Unit, Comment) VALUES (\'%s\', %d, \'%s\', \'%s\', \'%s\')' % (name, price, restrictions, unit, comment)
+    def add_entry_sql(self, table, cols, values):
+        retrieved_values = list(map(self.get_values, values))
+        retrieved_values = list(map(lambda s: s.strip(), retrieved_values))
+        col_string = ', '.join(cols[1:])
+        values_string = '\', \''.join(retrieved_values)
+        sql_insert = 'INSERT INTO %s (%s) VALUES (\'%s\')' % (table, col_string, values_string)
         self.conn.execute(sql_insert)
         self.conn.commit()
+
+    def get_values(self, text_widget):
+        value = text_widget.get("1.0", END)
+        return value
 
 
 if __name__ == "__main__":
